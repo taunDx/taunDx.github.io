@@ -63,7 +63,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebas
 
   async function actualizarLista() {
     const registros = [];
-    let vendidos = 0, pendientes = 0, disponibles = 0;
+    let vendidos = 0;
+    let pendientes = 0;
+    let disponibles = 0;
     const estadoFiltro = filtroEstado.value;
     const promises = [];
 
@@ -86,8 +88,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebas
     }
 
     await Promise.all(promises);
-    listaParticipantes.innerHTML = registros.sort().join("<br>");
 
+    listaParticipantes.innerHTML = registros.sort((a, b) => a.localeCompare(b)).join("<br>");
     const totalRecaudado = (vendidos + pendientes) * valorBoleta;
     resumenEstadisticas.innerHTML = `
       <strong>Resumen:</strong><br>
@@ -97,13 +99,22 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebas
       <strong>Total recaudado: COP $${totalRecaudado}</strong>
     `;
 
-    barraVendidosMeta.style.width = `${(vendidos * valorBoleta) / 600000 * 100}%`;
-    barraPendientesMeta.style.width = `${(pendientes * valorBoleta) / 600000 * 100}%`;
-    textoMeta.textContent = `Meta 600k: ${Math.round((vendidos + pendientes) * valorBoleta / 600000 * 100)}%`;
+    // --- BARRA META 600K ---
+    const vendidosEnDinero = vendidos * valorBoleta;
+    const meta = 600000;
+    const porcentajeVendidosMeta = Math.min((vendidosEnDinero / meta) * 100, 100);
+    const porcentajePendientesMeta = Math.max(100 - porcentajeVendidosMeta, 0);
 
-    barraVendidos.style.width = `${(vendidos / totalNumeros) * 100}%`;
-    barraPendientes.style.width = `${(pendientes / totalNumeros) * 100}%`;
-    textoTotal.textContent = `Total: ${Math.round((vendidos + pendientes) / totalNumeros * 100)}%`;
+    barraVendidosMeta.style.width = `${porcentajeVendidosMeta}%`;
+    barraPendientesMeta.style.width = `${porcentajePendientesMeta}%`;
+    textoMeta.textContent = `Meta 600k: ${Math.round(porcentajeVendidosMeta)}%`;
+
+    // --- BARRA TOTAL (queda igual) ---
+    const porcentajeVendidos = (vendidos / totalNumeros) * 100;
+    const porcentajePendientes = (pendientes / totalNumeros) * 100;
+    barraVendidos.style.width = `${porcentajeVendidos}%`;
+    barraPendientes.style.width = `${porcentajePendientes}%`;
+    textoTotal.textContent = `Total: ${Math.round(porcentajeVendidos + porcentajePendientes)}%`;
   }
 
   for (let i = 0; i < totalNumeros; i++) {

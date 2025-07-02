@@ -88,35 +88,43 @@ body {
   }
 
   .progress-container {
-    margin: 10px auto;
-    width: 100%;
-    max-width: 600px;
-  }
+  margin: 10px auto;
+  width: 100%;
+  max-width: 600px;
+}
 
-  .progress-bar {
-    background-color: #ddd;
-    border-radius: 8px;
-    overflow: hidden;
-    height: 25px;
-    margin-bottom: 10px;
-    position: relative;
-    display: flex;
-  }
+.progress-bar {
+  background-color: #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  height: 25px;
+  margin-bottom: 10px;
+  position: relative;
+  display: flex;
+}
 
-  .verde { background-color: #81c784; height: 100%; }
-  .amarillo { background-color: #fff176; height: 100%; }
-  .blue { background-color: #90caf9; }
+.verde {
+  background-color: #81c784;
+  height: 100%;
+  transition: width 0.4s;
+}
 
+.amarillo {
+  background-color: #fff176;
+  height: 100%;
+  transition: width 0.4s;
+}
 
-  .progress-text {
-    position: absolute;
-    width: 100%;
-    text-align: center;
-    font-weight: bold;
-    line-height: 25px;
-  }
+.progress-text {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  font-weight: bold;
+  line-height: 25px;
+  z-index: 2;
+}
 
-  #toggleInscritos {
+#toggleInscritos {
   display: block;
   margin: 20px auto 10px;
   padding: 10px 20px;
@@ -214,3 +222,46 @@ body {
       border-radius: 6px;
       text-decoration: none;
     }
+
+    .barra-meta {
+  height: 24px;
+  background: #e0e0e0;
+  border-radius: 12px;
+  overflow: hidden;
+  width: 100%;
+  margin-bottom: 8px;
+  position: relative;
+}
+
+.barra-vendidos-meta {
+  height: 100%;
+  background: #4caf50;
+  border-radius: 12px 0 0 12px;
+  transition: width 0.4s;
+  width: 0;
+}
+
+/* Barra amarilla para pendientes de meta */
+.barra-pendientes-meta {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background: #ffc107;
+  border-radius: 12px 0 0 12px;
+  transition: width 0.4s;
+  z-index: 0;
+  width: 0;
+}
+
+/* El texto centrado dentro de la barra */
+.texto-meta {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  line-height: 24px;
+  font-weight: bold;
+  color: #222;
+  z-index: 2;
+  pointer-events: none;
+}
