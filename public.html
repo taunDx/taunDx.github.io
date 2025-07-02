@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rifa Pública</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+    }
+    .intro {
+      text-align: center;
+      font-size: 1.1em;
+      margin-top: 10px;
+    }
+    .intro span {
+      font-size: 1.8em;
+      font-weight: bold;
+      color: green;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+      gap: 8px;
+      max-width: 600px;
+      margin: 20px auto;
+    }
+    .cell {
+      background-color: white;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      text-align: center;
+      padding: 10px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .vendido { background-color: #ccc; cursor: not-allowed; }
+    .pendiente { background-color: #f28b82; cursor: not-allowed; }
+    .solicitado { background-color: #82b1ff; }
+    .notas {
+      max-width: 600px;
+      margin: 20px auto;
+      background-color: #fff3cd;
+      padding: 10px;
+      border: 1px solid #ffeeba;
+      border-radius: 6px;
+    }
+    .notas ul {
+      padding-left: 20px;
+    }
+    .modal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      width: 300px;
+    }
+    .modal-content input, .modal-content select {
+      width: 100%;
+      padding: 8px;
+      margin: 8px 0;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    .qr {
+      text-align: center;
+      margin-top: 10px;
+    }
+    footer {
+      text-align: center;
+      margin-top: 30px;
+      font-size: 0.9em;
+      color: #555;
+    }
+    .manual, .comprobante-section {
+  max-width: 500px;
+  margin: 30px auto;
+  background: #ffffff;
+  border: 1px solid #ddd;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+  text-align: center;
+}
+
+.manual h2, .comprobante-section h2 {
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.manual ol {
+  text-align: left;
+  padding-left: 20px;
+}
+
+.comprobante-section input[type="text"],
+.comprobante-section input[type="file"],
+.comprobante-section button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.comprobante-section button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.comprobante-section button:hover {
+  background-color: #45a049;
+}
+
+.estado-subida {
+  font-size: 0.95em;
+  margin-top: 10px;
+}
+
+  </style>
+</head>
+<body>
+  <h1>Rifa Pro Fondos</h1>
+  <div class="intro">
+    Participa en la rifa pro universidad y gana <span>$600.000</span><br>
+    Cada boleta cuesta <strong>$20.000</strong><br>
+    Juega el <strong>domingo 6 de julio</strong> por las últimas 2 cifras de la <strong>Lotería Dorado Noche</strong>
+  </div>
+
+
+  <div class="notas">
+    <strong>Notas importantes:</strong>
+    <ul>
+      <li>🟥 Casillas rojas: apartadas, no disponibles.</li>
+      <li>⬜ Gris: ya pagadas.</li>
+      <li>🔵 Azul: en proceso de confirmación.</li>
+    </ul>
+  </div>
+  <div class="manual">
+  <h2>¿Cómo reservar?</h2>
+  <ol>
+    <li>Selecciona el número que deseas.</li>
+    <li>Completa tu nombre, apellido y elige método de pago (obligatorio).</li>
+    <li>Sube el comprobante y pulsa "Enviar solicitud".</li>
+    <li>Te notificaremos cuando se confirme.</li>
+  </ol>
+</div>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="modal" id="modal">
+    <div class="modal-content">
+      <h3>Solicitar número <span id="numSeleccionado"></span></h3>
+      <input type="text" id="nombre" placeholder="Nombre" required />
+      <input type="text" id="apellido" placeholder="Apellido" required />
+      <select id="metodo" required>
+        <option value="" disabled selected>Selecciona método de pago</option>
+        <option value="nequi">Nequi</option>
+        <option value="bancolombia">Bancolombia</option>
+      </select>
+
+      <button type="button" onclick="enviarSolicitud()">Solicitar</button>
+      <div class="qr" id="qrContainer">
+  <div id="info-nequi" style="display: block;">
+    <p>Realiza el pago al número <strong>3005703458</strong> vía Nequi</p>
+    <img src="QRnequi.png" alt="QR Nequi" width="180" />
+  </div>
+  <div id="info-bancolombia" style="display: none;">
+    <p>Realiza el pago a la cuenta <br><strong>912-723181-11</strong></p>
+    <p><strong>Tipo:</strong> Ahorros – Bancolombia</p>
+    <img src="QRbancolombia.jpeg" alt="QR Bancolombia" width="180" />
+  </div>
+</div>
+
+      <p style="font-size: 0.9em; color: #777; text-align: center;">Después de enviar tu solicitud, debes enviar el comprobante por chat. El estado se actualizará manualmente.</p>
+    </div>
+  </div>
+  <div class="comprobante-section">
+  <h2>¿Ya pagaste?</h2>
+  <p>Ahora sube tu comprobante aquí seleccionando el/los número(s) que pagaste.</p>
+  <form id="formComprobante">
+    <input type="text" id="numerosComprobante" placeholder="Ej: 12, 45, 87" required />
+    <input type="file" id="imagenComprobante" accept="image/*" required />
+    <button type="submit">Subir comprobante</button>
+  </form>
+  <p id="estadoSubida" style="margin-top: 10px; color: green;"></p>
+</div>
+
+  <footer>Hecho por el propio <strong>Juan David Giraldo Regino</strong> :).</footer>
+
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+  import { getFirestore, doc, getDoc, onSnapshot, setDoc, addDoc, collection } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
+  import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-storage.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCmfnmwARjEAwIO0AL1ARHW8JVelcR8ZWc",
+    authDomain: "rifa-pro-fondos.firebaseapp.com",
+    projectId: "rifa-pro-fondos",
+    storageBucket: "rifa-pro-fondos.appspot.com",
+    messagingSenderId: "902059536686",
+    appId: "1:902059536686:web:be80e12bcb5aa8f4158abf"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const storage = getStorage(app);
+
+  const grid = document.getElementById("grid");
+  const modal = document.getElementById("modal");
+  const numSeleccionadoSpan = document.getElementById("numSeleccionado");
+  const nombre = document.getElementById("nombre");
+  const apellido = document.getElementById("apellido");
+  const metodo = document.getElementById("metodo");
+  const qrContainer = document.getElementById("qrContainer");
+  const infoNequi = document.getElementById("info-nequi");
+  const infoBancolombia = document.getElementById("info-bancolombia");
+
+  metodo.addEventListener("change", () => {
+    if (metodo.value === "nequi") {
+      infoNequi.style.display = "block";
+      infoBancolombia.style.display = "none";
+    } else if (metodo.value === "bancolombia") {
+      infoNequi.style.display = "none";
+      infoBancolombia.style.display = "block";
+    }
+  });
+
+  let numeroSeleccionado = null;
+  const totalNumeros = 100;
+
+  for (let i = 0; i < totalNumeros; i++) {
+    const cell = document.createElement("div");
+    cell.classList.add("cell");
+    cell.textContent = i;
+    grid.appendChild(cell);
+
+    const docRef = doc(db, "numeros", i.toString());
+    onSnapshot(docRef, (snap) => {
+      cell.className = "cell";
+      if (!snap.exists() || snap.data().estado === "disponible") {
+        cell.onclick = () => abrirModal(i);
+      } else if (snap.data().estado === "vendido") {
+        cell.classList.add("vendido");
+      } else if (snap.data().estado === "pendiente") {
+        cell.classList.add("pendiente");
+      } else if (snap.data().estado === "solicitado") {
+        cell.classList.add("solicitado");
+      }
+    });
+  }
+
+  function abrirModal(numero) {
+    numeroSeleccionado = numero;
+    numSeleccionadoSpan.textContent = numero;
+    modal.style.display = "flex";
+  }
+
+  window.enviarSolicitud = async function () {
+    if (!nombre.value.trim() || !apellido.value.trim() || !metodo.value) {
+      alert("Por favor completa todos los campos obligatorios.");
+      return;
+    }
+
+    await setDoc(doc(db, "numeros", numeroSeleccionado.toString()), {
+      estado: "solicitado",
+      nombre: nombre.value,
+      apellido: apellido.value
+    });
+
+    await addDoc(collection(db, "solicitudes"), {
+      numero: numeroSeleccionado,
+      nombre: nombre.value,
+      apellido: apellido.value,
+      metodo: metodo.value,
+      fecha: new Date().toISOString()
+    });
+
+    alert("Solicitud enviada. No olvides subir el comprobante más abajo.");
+    modal.style.display = "none";
+    nombre.value = "";
+    apellido.value = "";
+    metodo.value = "";
+  };
+
+  window.onclick = function (e) {
+    if (e.target == modal) {
+      modal.style.display = "none";
+    }
+  };
+
+  // 📤 Subida de comprobantes
+  const formComprobante = document.getElementById("formComprobante");
+  const numerosInput = document.getElementById("numerosComprobante");
+  const imagenInput = document.getElementById("imagenComprobante");
+  const estadoSubida = document.getElementById("estadoSubida");
+
+  formComprobante.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const numeros = numerosInput.value.trim();
+    const archivo = imagenInput.files[0];
+
+    if (!numeros || !archivo) {
+      estadoSubida.style.color = "red";
+      estadoSubida.textContent = "Por favor completa todos los campos.";
+      return;
+    }
+
+    const timestamp = Date.now();
+    const nombreLimpio = numeros.replace(/\s+/g, '-').replace(/,/g, '-');
+    const nombreArchivo = `comprobantes/${nombreLimpio}_${timestamp}_${archivo.name}`;
+    const archivoRef = ref(storage, nombreArchivo);
+
+    try {
+      // Subir imagen a Firebase Storage
+      await uploadBytes(archivoRef, archivo);
+
+      // Obtener URL pública
+      const url = await getDownloadURL(archivoRef);
+
+      // Guardar info en Firestore
+      await addDoc(collection(db, "comprobantes"), {
+        numeros,
+        url,
+        path: nombreArchivo,
+        fecha: new Date().toISOString()
+      });
+
+      estadoSubida.style.color = "green";
+      estadoSubida.textContent = "¡Comprobante subido exitosamente!";
+      formComprobante.reset();
+    } catch (err) {
+      console.error(err);
+      estadoSubida.style.color = "red";
+      estadoSubida.textContent = "Error al subir el comprobante.";
+    }
+  });
+</script>
+
+</body>
+</html>

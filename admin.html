@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Acceso restringido</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      padding: 40px;
+      text-align: center;
+    }
+
+    #login {
+      background-color: white;
+      padding: 30px;
+      max-width: 400px;
+      margin: auto;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    input[type="password"] {
+      width: 80%;
+      padding: 10px;
+      margin-top: 20px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .error {
+      color: red;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="login">
+  <h2>🔐 Acceso restringido</h2>
+  <p>Ingresa la contraseña para acceder al panel de administración.</p>
+  <input type="password" id="passwordInput" placeholder="Contraseña" />
+  <br>
+  <button onclick="verificarPassword()">Ingresar</button>
+  <div class="error" id="errorMsg"></div>
+</div>
+
+<script>
+  const CONTRASEÑA_CORRECTA = "rifaeafit"; // 
+
+  function verificarPassword() {
+    const input = document.getElementById("passwordInput").value;
+    const error = document.getElementById("errorMsg");
+
+    if (input === CONTRASEÑA_CORRECTA) {
+      // Redirigir a la vista real de administración
+      window.location.href = "admin-real.html";
+    } else {
+      error.textContent = "Contraseña incorrecta. Intenta de nuevo.";
+    }
+  }
+</script>
+
+</body>
+</html>
