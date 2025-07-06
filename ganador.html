@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ganador de la Rifa</title>
+  <link rel="stylesheet" href="index.css" />
+  <style>
+    body {
+      background: #f5f5f5;
+      font-family: Arial, sans-serif;
+    }
+    .ganador-container {
+      max-width: 500px;
+      margin: 40px auto;
+      text-align: center;
+      background: #fff;
+      padding: 2em;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px #0002;
+    }
+    .nombre-ganador {
+      font-size: 2em;
+      color: #1a8917;
+      margin: 1em 0;
+    }
+    .captura {
+      margin: 2em 0 1em 0;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      max-width: 100%;
+    }
+    .verificar {
+      margin: 1.5em 0 0.5em 0;
+      font-size: 1em;
+      color: #333;
+    }
+    .verificar a {
+      color: #007bff;
+      text-decoration: underline;
+    }
+    .footer {
+      margin-top: 2em;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <div class="ganador-container">
+    <h1>🎉 ¡Felicidades al número:</h1>
+    <div class="nombre-ganador" id="nombreGanador">Cargando...</div>
+    <img src="resultados.png" alt="Captura de la rifa" class="captura" />
+    <div class="verificar">
+      Si desea verificar el número ganador aquí puede confirmarlo:<br>
+      <a href="https://www.colombia.com/loterias/dorado-noche" target="_blank" rel="noopener">https://www.colombia.com/loterias/dorado-noche</a>
+    </div>
+    <div class="footer">
+      Muchas gracias a todos por participar y colaborarme 🙏
+    </div>
+  </div>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCmfnmwARjEAwIO0AL1ARHW8JVelcR8ZWc",
+      authDomain: "rifa-pro-fondos.firebaseapp.com",
+      projectId: "rifa-pro-fondos",
+      storageBucket: "rifa-pro-fondos.firebasestorage.app",
+      messagingSenderId: "902059536686",
+      appId: "1:902059536686:web:be80e12bcb5aa8f4158abf"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function mostrarGanador() {
+      const ganadorDoc = await getDoc(doc(db, "config", "ganador"));
+      const nombreGanadorDiv = document.getElementById("nombreGanador");
+      if (ganadorDoc.exists()) {
+        const numero = ganadorDoc.data().numero;
+        if (numero !== undefined && numero !== null && numero !== "") {
+          nombreGanadorDiv.textContent = `#${numero}`;
+        } else {
+          nombreGanadorDiv.textContent = "Aún no se ha seleccionado ganador.";
+        }
+      } else {
+        nombreGanadorDiv.textContent = "Aún no se ha seleccionado ganador.";
+      }
+    }
+    mostrarGanador();
+  </script>
+</body>
+</html>

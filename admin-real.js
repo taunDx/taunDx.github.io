@@ -48,6 +48,10 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebas
   const estadoInput = document.getElementById("estadoInput");
   const noticiasAdmin = document.getElementById("noticiasAdmin");
   const listaComprobantes = document.getElementById("listaComprobantes");
+  const selectorGanador = document.getElementById("selectorGanador");
+  const nombreGanadorAdmin = document.getElementById("nombreGanadorAdmin");
+  const guardarGanadorBtn = document.getElementById("guardarGanadorBtn");
+  const mensajeGanadorAdmin = document.getElementById("mensajeGanadorAdmin");
 
   let numeroSeleccionado = null;
 
@@ -287,3 +291,56 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebas
       alert("No autenticado. Recarga la página.");
     }
   });
+
+  // --- Selección de ganador desde admin ---
+  // Llenar el selector con los números vendidos
+  async function llenarSelectorGanador() {
+    if (!selectorGanador) return;
+    selectorGanador.innerHTML = '<option value="">-- Selecciona un número --</option>';
+    for (let i = 0; i < totalNumeros; i++) {
+      const numRef = doc(db, "numeros", i.toString());
+      const docSnap = await getDoc(numRef);
+      if (docSnap.exists()) {
+        const estado = docSnap.data().estado;
+        if (estado === "vendido" || estado === "pendiente") {
+          const option = document.createElement("option");
+          option.value = i;
+          option.textContent = `#${i} (${estado})`;
+          selectorGanador.appendChild(option);
+        }
+      }
+    }
+  }
+  llenarSelectorGanador();
+
+  if (selectorGanador) {
+    selectorGanador.addEventListener("change", async function() {
+      const numero = selectorGanador.value;
+      if (!numero) {
+        nombreGanadorAdmin.textContent = "";
+        return;
+      }
+      const numRef = doc(db, "numeros", numero);
+      const docSnap = await getDoc(numRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        const nombre = (data.nombre || "") + " " + (data.apellido || "");
+        nombreGanadorAdmin.textContent = `${nombre.trim()}`;
+      } else {
+        nombreGanadorAdmin.textContent = "No encontrado";
+      }
+    });
+
+    guardarGanadorBtn.addEventListener("click", async function() {
+      const numero = selectorGanador.value;
+      if (!numero) {
+        mensajeGanadorAdmin.style.color = "red";
+        mensajeGanadorAdmin.textContent = "Selecciona un número válido.";
+        return;
+      }
+      // Guarda el número ganador en un documento especial
+      await setDoc(doc(db, "config", "ganador"), { numero: numero });
+      mensajeGanadorAdmin.style.color = "green";
+      mensajeGanadorAdmin.textContent = "¡Ganador guardado correctamente!";
+    });
+  }
