@@ -36,28 +36,22 @@
   <div class="grid" id="grid"></div>
 
   <div class="modal" id="modal">
-    <div class="modal-content">
+    <div class="modal-content" style="position: relative;">
+      <button class="modal-close" onclick="document.getElementById('modal').style.display='none'" aria-label="Cerrar" style="position: absolute; right: 8px; top: 8px; background: transparent; border: none; font-size: 1.4rem; cursor: pointer;">×</button>
       <h3>Solicitar número <span id="numSeleccionado"></span></h3>
       <input type="text" id="nombre" placeholder="Nombre" required />
       <input type="text" id="apellido" placeholder="Apellido" required />
-      <select id="metodo" required>
-        <option value="" disabled selected>Selecciona método de pago</option>
-        <option value="nequi">Nequi</option>
-        
-      </select>
+      <input type="hidden" id="metodo" value="nequi" />
+      <div class="payment-info" style="text-align:center; margin: 8px 0;">
+        <p>Método de pago: <strong>Nequi</strong></p>
+        <p>Realiza el pago al número <strong>3108320189</strong> vía Nequi</p>
+        <img src="QRnequi.png" alt="QR Nequi" width="180" />
+      </div>
 
-      <button type="button" onclick="enviarSolicitud()">Solicitar</button>
-      <div class="qr" id="qrContainer">
-  <div id="info-nequi" style="display: none;">
-    <p>Realiza el pago al número <strong>3005703458</strong> vía Nequi</p>
-    <img src="QRnequi.png" alt="QR Nequi" width="180" />
-  </div>
-  <div id="info-bancolombia" style="display: none;">
-    <p>Realiza el pago a la cuenta <br><strong>912-723181-11</strong></p>
-    <p><strong>Tipo:</strong> Ahorros – Bancolombia</p>
-    <img src="QRbancolombia.jpeg" alt="QR Bancolombia" width="180" />
-  </div>
-</div>
+      <div style="text-align: center; margin-top: 12px;">
+        <button type="button" onclick="enviarSolicitud()" style="padding: 8px 16px; cursor: pointer;">Solicitar</button>
+      </div>
+      <!-- QR Nequi mostrado arriba; no se necesita contenedor adicional -->
 
       <p style="font-size: 0.9em; color: #777; text-align: center;">Después de enviar tu solicitud, debes enviar el comprobante. El estado se actualizará manualmente.</p>
     </div>
